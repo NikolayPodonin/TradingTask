@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="quotes_logo_url_prefix" translatable="false">https://tradernet.com/logos/get-logo-by-ticker?ticker=%s</string>
+    <string name="quotes_exchange_and_name" translatable="false">%1$s | %2$s</string>
+    <string name="quotes_percent" translatable="false" formatted="false">%s\%%</string>
+    <string name="quotes_price_and_change" translatable="false">%1$s ( %2$s )</string>
+</resources>

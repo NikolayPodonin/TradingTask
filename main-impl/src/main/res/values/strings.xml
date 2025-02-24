@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="points_edit_text_hint">Введите число точек</string>
+    <string name="points_button_text">Поехали!</string>
+    <string name="points_unexpected_error">Неизвестная ошибка</string>
+</resources>
