@@ -20,7 +20,6 @@ class QuotesInteractorImpl @Inject constructor(
             limit = 30,
             gainers = 0
         )
-        Log.d("QuotesInteractor", paperList.toString())
         quotesRepository.subscribeOnQuotes(paperList)
     }
 

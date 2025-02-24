@@ -67,6 +67,5 @@ class QuotesRepositoryImpl @Inject constructor(
 
     companion object {
         private const val REQUEST_EVENT = "realtimeQuotes"
-        private const val SOCKET_DEBOUNCE_TIME = 500L
     }
 }
