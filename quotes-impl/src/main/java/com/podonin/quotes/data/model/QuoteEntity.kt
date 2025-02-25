@@ -12,10 +12,10 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 @Entity(tableName = "quotes")
 data class QuoteEntity(
     @PrimaryKey @SerialName("c") val ticker: String, // Тикер
-    @SerialName("name") val lastTradeExchange: String?, // Биржа последней сделки
-    @SerialName("ltr") val name: String?, // Название бумаги
-    @SerialName("ltp") val lastTradePrice: Double?, // Цена последней сделки
-    @SerialName("chg") val lastTradeChange: Double?, // Изменение цены последней сделки в пунктах относительно цены закрытия предыдущей торговой сессии
-    @SerialName("pcp") val lastTradeChangePercent: Double?, // Изменение в процентах относительно цены закрытия предыдущей торговой сессии
-    @SerialName("min_step") val minStep: Double?, // Минимальный шаг цены
+    @SerialName("name") val lastTradeExchange: String? = null, // Биржа последней сделки
+    @SerialName("ltr") val name: String? = null, // Название бумаги
+    @SerialName("ltp") val lastTradePrice: Double? = null, // Цена последней сделки
+    @SerialName("chg") val lastTradeChange: Double? = null, // Изменение цены последней сделки в пунктах относительно цены закрытия предыдущей торговой сессии
+    @SerialName("pcp") val lastTradeChangePercent: Double? = null, // Изменение в процентах относительно цены закрытия предыдущей торговой сессии
+    @SerialName("min_step") val minStep: Double? = null, // Минимальный шаг цены
 )

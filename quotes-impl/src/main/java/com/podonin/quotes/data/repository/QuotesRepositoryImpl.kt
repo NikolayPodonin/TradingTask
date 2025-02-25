@@ -8,6 +8,7 @@ import com.podonin.quotes.domain.model.Quote
 import com.podonin.quotes.domain.repository.QuotesRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +24,7 @@ class QuotesRepositoryImpl @Inject constructor(
     override suspend fun subscribeOnQuotes(paperList: List<String>) {
         coroutineScope {
             launch(dispatchersHolder.io) {
-                quoteSocketDataSource.subscribeOnQuotes(paperList).collect { quote ->
+                quoteSocketDataSource.subscribeOnQuotes(paperList).collectLatest { quote ->
                     quotesDBDataSource.insertOrUpdate(quote)
                 }
             }

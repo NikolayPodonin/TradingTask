@@ -13,7 +13,7 @@ class QuotesInteractorImpl @Inject constructor(
     private val tickersRepository: TickersRepository
 ) : QuotesInteractor {
 
-    private val errorFlow = mutableSharedFlow<Unit>()
+    private val errorFlow = mutableSharedFlow<String?>()
 
     override suspend fun subscribeOnQuotes() {
         try {
@@ -26,7 +26,7 @@ class QuotesInteractorImpl @Inject constructor(
             quotesRepository.subscribeOnQuotes(paperList)
         } catch (e: Exception) {
             Log.e("QuotesInteractorImpl", "Error subscribing on quotes: ${e.message}")
-            errorFlow.tryEmit(Unit)
+            errorFlow.tryEmit(e.message)
         }
     }
 
@@ -34,7 +34,7 @@ class QuotesInteractorImpl @Inject constructor(
         return quotesRepository.getQuotesFlow()
     }
 
-    override fun getErrorFlow(): Flow<Unit> {
+    override fun getErrorFlow(): Flow<String?> {
         return errorFlow
     }
 

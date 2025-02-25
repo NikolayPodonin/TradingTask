@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface QuotesInteractor {
     suspend fun subscribeOnQuotes()
     fun getQuotesFlow(): Flow<List<Quote>>
-    fun getErrorFlow(): Flow<Unit>
+    fun getErrorFlow(): Flow<String?>
 }
