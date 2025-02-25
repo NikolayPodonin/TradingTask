@@ -4,9 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.podonin.common_ui.view_model.stateInVM
 import com.podonin.quotes.domain.QuotesInteractor
-import com.podonin.quotes.presentation.mapper.QuoteItemMapper
+import com.podonin.quotes.presentation.ui.mapper.QuoteItemMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,6 +20,8 @@ class QuotesViewModel @Inject constructor(
         .getQuotesFlow()
         .map { quotes -> quoteItemMapper.mapToItems(quotes) }
         .stateInVM(initial = emptyList())
+
+    val errorFlow = quotesInteractor.getErrorFlow()
 
     init {
         viewModelScope.launch {

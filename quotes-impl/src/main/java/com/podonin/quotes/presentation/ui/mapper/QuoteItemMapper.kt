@@ -1,9 +1,9 @@
-package com.podonin.quotes.presentation.mapper
+package com.podonin.quotes.presentation.ui.mapper
 
 import com.podonin.common_ui.resources_provider.ResourcesProvider
 import com.podonin.common_utils.orZero
-import com.podonin.quotes.presentation.model.QuoteItem
-import com.podonin.quotes_api.data.model.Quote
+import com.podonin.quotes.domain.model.Quote
+import com.podonin.quotes.presentation.ui.model.QuoteItem
 import com.podonin.quotes_impl.R
 import javax.inject.Inject
 
@@ -33,11 +33,11 @@ class QuoteItemMapper @Inject constructor(
 
     private fun Quote.exchangeAndName() = when {
         lastTradeExchange.isNullOrEmpty() -> name.orEmpty()
-        name.isNullOrEmpty() -> lastTradeExchange.orEmpty()
+        name.isNullOrEmpty() -> lastTradeExchange
         else -> resourcesProvider.getString(
             R.string.quotes_exchange_and_name,
-            lastTradeExchange.orEmpty(),
-            name.orEmpty()
+            lastTradeExchange,
+            name
         )
     }
 

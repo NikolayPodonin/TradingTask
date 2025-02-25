@@ -1,9 +1,9 @@
-package com.podonin.quotes.data.database
+package com.podonin.quotes.data.datasources.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.podonin.quotes.data.database.dao.QuoteDao
-import com.podonin.quotes.data.database.entity.QuoteEntity
+import com.podonin.quotes.data.datasources.database.dao.QuoteDao
+import com.podonin.quotes.data.model.QuoteEntity
 
 @Database(entities = [QuoteEntity::class], version = 1)
 abstract class QuoteDatabase : RoomDatabase() {

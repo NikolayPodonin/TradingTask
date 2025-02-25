@@ -1,5 +1,4 @@
-package com.podonin.quotes.presentation
-
+package com.podonin.quotes.presentation.ui
 
 import androidx.annotation.ColorRes
 import androidx.compose.animation.animateColorAsState
@@ -27,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -44,30 +42,25 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.SingletonImageLoader
 import coil3.compose.AsyncImage
 import coil3.memory.MemoryCache
 import coil3.request.ImageRequest
+import com.podonin.common_ui.R
 import com.podonin.common_ui.compose.textSizeResource
 import com.podonin.common_ui.compose.toDp
-import com.podonin.quotes.presentation.model.QuoteItem
-import com.podonin.quotes_impl.R
-import com.podonin.common_ui.R as CommonUiR
+import com.podonin.quotes.presentation.ui.model.QuoteItem
 
 private const val IMAGE_EXPAND_DURATION = 150
 private const val BACKGROUND_CHANGE_DURATION = 300
 private const val BACKGROUND_CHANGE_DELAY = 100
 
 @Composable
-fun QuotesScreen(
-    modifier: Modifier = Modifier,
-    viewModel: QuotesViewModel = hiltViewModel()
+fun ListStateScreen(
+    quotes: List<QuoteItem>,
+    modifier: Modifier = Modifier
 ) {
-    val quotes by viewModel.quotesFlow.collectAsState()
-
-    val bigPadding = dimensionResource(CommonUiR.dimen.material_margin_big)
+    val bigPadding = dimensionResource(R.dimen.material_margin_big)
     val statusBarPaddings = WindowInsets.statusBars.asPaddingValues()
     val navBarPaddings = WindowInsets.navigationBars.asPaddingValues()
     LazyColumn(
@@ -91,7 +84,7 @@ fun QuotesScreen(
 
 @Composable
 fun ItemQuote(quote: QuoteItem) {
-    val mediumPadding = dimensionResource(CommonUiR.dimen.material_margin_medium)
+    val mediumPadding = dimensionResource(R.dimen.material_margin_medium)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -109,7 +102,7 @@ fun ItemQuote(quote: QuoteItem) {
 
                 Text(
                     text = quote.ticker,
-                    fontSize = textSizeResource(R.dimen.text_size_big),
+                    fontSize = textSizeResource(com.podonin.quotes_impl.R.dimen.text_size_big),
                     modifier = Modifier
                         .wrapContentHeight()
                         .fillMaxWidth(),
@@ -120,7 +113,7 @@ fun ItemQuote(quote: QuoteItem) {
                 Text(
                     text = quote.exchangeAndName,
                     color = Color.Gray,
-                    fontSize = textSizeResource(R.dimen.text_size_small),
+                    fontSize = textSizeResource(com.podonin.quotes_impl.R.dimen.text_size_small),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -131,7 +124,7 @@ fun ItemQuote(quote: QuoteItem) {
             AnimatedText(quote)
             Text(
                 text = quote.priceAndChange,
-                fontSize = textSizeResource(R.dimen.text_size_normal)
+                fontSize = textSizeResource(com.podonin.quotes_impl.R.dimen.text_size_normal)
             )
         }
     }
@@ -153,13 +146,13 @@ private fun AnimatedText(quote: QuoteItem) {
         }
     )
     val actualTextColor = if (quote.isPositive) {
-        colorResource(R.color.light_green)
+        colorResource(com.podonin.quotes_impl.R.color.light_green)
     } else {
-        colorResource(R.color.light_red)
+        colorResource(com.podonin.quotes_impl.R.color.light_red)
     }
 
     val targetTextColor = if (actualPriceChanged != ActualPriceChanged.None) {
-        colorResource(R.color.white)
+        colorResource(com.podonin.quotes_impl.R.color.white)
     } else {
         actualTextColor
     }
@@ -204,15 +197,15 @@ private fun AnimatedText(quote: QuoteItem) {
             .wrapContentSize()
             .background(
                 color = animatedBackgroundColor,
-                shape = RoundedCornerShape(dimensionResource(CommonUiR.dimen.material_margin_medium))
+                shape = RoundedCornerShape(dimensionResource(R.dimen.material_margin_medium))
             )
-            .padding(dimensionResource(CommonUiR.dimen.material_margin_small))
+            .padding(dimensionResource(R.dimen.material_margin_small))
     ) {
         Text(
             text = quote.percent,
             style = TextStyle(
                 color = animatedTextColor,
-                fontSize = textSizeResource(R.dimen.text_size_big)
+                fontSize = textSizeResource(com.podonin.quotes_impl.R.dimen.text_size_big)
             )
         )
     }
@@ -259,13 +252,13 @@ private fun AnimatedImage(
         contentScale = ContentScale.Fit,
     )
     if (isLoaded || isCached) {
-        val mediumPadding = dimensionResource(CommonUiR.dimen.material_margin_medium)
+        val mediumPadding = dimensionResource(R.dimen.material_margin_medium)
         Spacer(modifier = Modifier.width(mediumPadding))
     }
 }
 
 private enum class ActualPriceChanged(@ColorRes val backgroundColor: Int) {
     None(android.R.color.transparent),
-    Negative(R.color.red),
-    Positive(R.color.green)
+    Negative(com.podonin.quotes_impl.R.color.red),
+    Positive(com.podonin.quotes_impl.R.color.green)
 }

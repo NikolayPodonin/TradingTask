@@ -1,4 +1,4 @@
-package com.podonin.quotes.presentation.model
+package com.podonin.quotes.presentation.ui.model
 
 data class QuoteItem(
     val ticker: String,

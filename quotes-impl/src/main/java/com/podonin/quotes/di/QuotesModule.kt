@@ -2,19 +2,21 @@ package com.podonin.quotes.di
 
 import android.content.Context
 import androidx.room.Room
-import com.podonin.quotes.data.api.QuotesApi
-import com.podonin.quotes.data.api.QuotesApiImpl
-import com.podonin.quotes.data.repository.QuotesDBRepositoryImpl
+import com.podonin.quotes.data.datasources.api.QuotesApiDataSource
+import com.podonin.quotes.data.datasources.api.QuotesApiDataSourceImpl
+import com.podonin.quotes.data.datasources.database.QuoteDatabase
+import com.podonin.quotes.data.datasources.database.QuotesDBDataSource
+import com.podonin.quotes.data.datasources.database.QuotesDBDataSourceImpl
+import com.podonin.quotes.data.datasources.database.dao.QuoteDao
+import com.podonin.quotes.data.datasources.socket.QuoteSocketDataSource
+import com.podonin.quotes.data.datasources.socket.QuoteSocketDataSourceImpl
 import com.podonin.quotes.data.repository.QuotesRepositoryImpl
-import com.podonin.quotes.data.database.QuoteDatabase
-import com.podonin.quotes.data.database.dao.QuoteDao
 import com.podonin.quotes.data.repository.TickersRepositoryImpl
 import com.podonin.quotes.domain.QuotesInteractor
 import com.podonin.quotes.domain.QuotesInteractorImpl
 import com.podonin.quotes.domain.repository.QuotesRepository
 import com.podonin.quotes.domain.repository.TickersRepository
 import com.podonin.quotes.navigation.QuotesEntryPointImpl
-import com.podonin.quotes_api.data.model.QuotesDBRepository
 import com.podonin.quotes_api.navigation.QuotesEntryPoint
 import dagger.Binds
 import dagger.Module
@@ -33,7 +35,15 @@ abstract class QuotesModule {
 
     @Binds
     @Singleton
-    abstract fun bindQuotesApi(impl: QuotesApiImpl): QuotesApi
+    abstract fun quotesApiDataSource(impl: QuotesApiDataSourceImpl): QuotesApiDataSource
+
+    @Binds
+    @Singleton
+    abstract fun quotesDBDataSource(impl: QuotesDBDataSourceImpl): QuotesDBDataSource
+
+    @Binds
+    @Singleton
+    abstract fun quotesSocketDataSource(impl: QuoteSocketDataSourceImpl): QuoteSocketDataSource
 
     @Binds
     @Singleton
@@ -42,10 +52,6 @@ abstract class QuotesModule {
     @Binds
     @Singleton
     abstract fun bindTickersRepository(impl: TickersRepositoryImpl): TickersRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindQuotesDBRepository(impl: QuotesDBRepositoryImpl): QuotesDBRepository
 
     @Binds
     abstract fun bindQuotesInteractor(impl: QuotesInteractorImpl): QuotesInteractor

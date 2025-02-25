@@ -1,10 +1,10 @@
-package com.podonin.quotes.data.database.dao
+package com.podonin.quotes.data.datasources.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.podonin.quotes.data.database.entity.QuoteEntity
+import com.podonin.quotes.data.model.QuoteEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

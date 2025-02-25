@@ -1,17 +1,7 @@
 package com.podonin.quotes.data.mapper
 
-import com.podonin.quotes.data.database.entity.QuoteEntity
-import com.podonin.quotes_api.data.model.Quote
-
-fun Quote.toEntity() = QuoteEntity(
-    ticker = ticker,
-    lastTradeExchange = lastTradeExchange,
-    name = name,
-    lastTradePrice = lastTradePrice,
-    lastTradeChange = lastTradeChange,
-    lastTradeChangePercent = lastTradeChangePercent,
-    minStep = minStep
-)
+import com.podonin.quotes.data.model.QuoteEntity
+import com.podonin.quotes.domain.model.Quote
 
 fun QuoteEntity.toModel() = Quote(
     ticker = ticker,

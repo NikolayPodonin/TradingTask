@@ -4,4 +4,7 @@
     <string name="quotes_exchange_and_name" translatable="false">%1$s | %2$s</string>
     <string name="quotes_percent" translatable="false" formatted="false">%s\%%</string>
     <string name="quotes_price_and_change" translatable="false">%1$s ( %2$s )</string>
+
+    <string name="quotes_empty_state_text">Nothing to show</string>
+    <string name="quotes_error_message">Something went wrong</string>
 </resources>

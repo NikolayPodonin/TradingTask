@@ -8,6 +8,7 @@ import io.ktor.client.plugins.websocket.wss
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.delay
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -79,7 +80,7 @@ class WebSocketClient(private val url: String) {
                 val data = jsonElement[1]
                 return eventType to data
             }
-        } catch (e: Exception) {
+        } catch (e: SerializationException) {
             Log.e("WebSocketClient", "Error parsing WebSocket message: ${e.message}")
         }
         return null

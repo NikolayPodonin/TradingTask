@@ -1,4 +1,4 @@
-package com.podonin.quotes.data.api.model.response
+package com.podonin.quotes.data.datasources.api.model.response
 
 import kotlinx.serialization.Serializable
 

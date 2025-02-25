@@ -1,3 +1,5 @@
 # TradingTask
-Обработка ошибок не сделана сознательно, т.к. нет требования и описания, как она должна быть реализована. 
-Если нужна, скажите дополнительно, доделаю.
+
+Real-time stock quotes tracking app.
+
+Technologies: Kotlin, Jetpack Compose, Ktor, WebSockets, Room, Coil, Hilt, Coroutines, Flow.

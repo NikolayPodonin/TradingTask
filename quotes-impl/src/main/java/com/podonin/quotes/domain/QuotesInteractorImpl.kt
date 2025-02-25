@@ -1,29 +1,47 @@
 package com.podonin.quotes.domain
 
 import android.util.Log
+import com.podonin.common_utils.mutableSharedFlow
+import com.podonin.quotes.domain.model.Quote
 import com.podonin.quotes.domain.repository.QuotesRepository
 import com.podonin.quotes.domain.repository.TickersRepository
-import com.podonin.quotes_api.data.model.Quote
-import com.podonin.quotes_api.data.model.QuotesDBRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class QuotesInteractorImpl @Inject constructor(
     private val quotesRepository: QuotesRepository,
-    private val quotesDBRepository: QuotesDBRepository,
     private val tickersRepository: TickersRepository
 ) : QuotesInteractor {
+
+    private val errorFlow = mutableSharedFlow<Unit>()
+
     override suspend fun subscribeOnQuotes() {
-        val paperList = tickersRepository.getTickers(
-            type = "stocks",
-            exchange = "russia",
-            limit = 30,
-            gainers = 0
-        )
-        quotesRepository.subscribeOnQuotes(paperList)
+        try {
+            val paperList = tickersRepository.getTickers(
+                type = STOCKS_TYPE,
+                exchange = RUSSIA_EXCHANGE,
+                limit = LIMIT,
+                gainers = GAINERS
+            )
+            quotesRepository.subscribeOnQuotes(paperList)
+        } catch (e: Exception) {
+            Log.e("QuotesInteractorImpl", "Error subscribing on quotes: ${e.message}")
+            errorFlow.tryEmit(Unit)
+        }
     }
 
     override fun getQuotesFlow(): Flow<List<Quote>> {
-        return quotesDBRepository.getQuotesFlow()
+        return quotesRepository.getQuotesFlow()
+    }
+
+    override fun getErrorFlow(): Flow<Unit> {
+        return errorFlow
+    }
+
+    companion object {
+        private const val STOCKS_TYPE = "stocks"
+        private const val RUSSIA_EXCHANGE = "russia"
+        private const val LIMIT = 30
+        private const val GAINERS = 0
     }
 }
