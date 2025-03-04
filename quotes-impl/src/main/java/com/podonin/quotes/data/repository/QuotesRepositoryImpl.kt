@@ -8,6 +8,7 @@ import com.podonin.quotes.domain.model.Quote
 import com.podonin.quotes.domain.repository.QuotesRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,10 +35,12 @@ class QuotesRepositoryImpl @Inject constructor(
     }
 
     override fun getQuotesFlow(): Flow<List<Quote>> {
-        return quotesDBDataSource.getQuotesFlow().map {
-            it.map { quoteEntity ->
-                quoteEntity.toModel()
+        return quotesDBDataSource.getQuotesFlow()
+            .debounce(200)
+            .map {
+                it.map { quoteEntity ->
+                    quoteEntity.toModel()
+                }
             }
-        }
     }
 }
