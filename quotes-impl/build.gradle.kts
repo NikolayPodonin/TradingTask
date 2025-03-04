@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.jetpack.compose.foundation)
     implementation(libs.jetpack.compose.runtime)
     implementation(libs.jetpack.compose.ui)
+    implementation(libs.jetpack.compose.constraint)
     implementation(libs.jetpack.compose.material3)
     implementation(libs.hilt.compose.navigation)
 

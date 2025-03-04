@@ -2,6 +2,7 @@ package com.podonin.quotes.presentation.ui.mapper
 
 import com.podonin.common_ui.resources_provider.ResourcesProvider
 import com.podonin.common_utils.orZero
+import com.podonin.common_utils.roundToStep
 import com.podonin.quotes.domain.model.Quote
 import com.podonin.quotes.presentation.ui.model.QuoteItem
 import com.podonin.quotes_impl.R
@@ -48,8 +49,8 @@ class QuoteItemMapper @Inject constructor(
 
     private fun Quote.priceAndChange() = resourcesProvider.getString(
         R.string.quotes_price_and_change,
-        lastTradePrice.orZero(),
-        lastTradeChange.orZero()
+        lastTradePrice.orZero().roundToStep(minStep.orZero()),
+        lastTradeChange.orZero().roundToStep(minStep.orZero())
     )
 
     private fun Quote.isPositiveChange() = lastTradeChangePercent.orZero() >= 0.0

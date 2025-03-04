@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "GraphicsTask"
+rootProject.name = "TradingTask"
 include(":app")
 include(":quotes-impl")
 include(":quotes-api")

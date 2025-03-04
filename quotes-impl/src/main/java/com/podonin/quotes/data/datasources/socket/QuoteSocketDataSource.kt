@@ -4,5 +4,6 @@ import com.podonin.quotes.data.model.QuoteEntity
 import kotlinx.coroutines.flow.Flow
 
 interface QuoteSocketDataSource {
-    suspend fun subscribeOnQuotes(papers: List<String>): Flow<QuoteEntity>
+    val quotesFlow: Flow<QuoteEntity>
+    suspend fun launchQuotesWS(papers: List<String>)
 }

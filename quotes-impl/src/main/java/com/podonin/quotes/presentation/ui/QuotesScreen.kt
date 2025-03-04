@@ -1,5 +1,6 @@
 package com.podonin.quotes.presentation.ui
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,10 +44,12 @@ fun QuotesScreen(
 
         val quotes by viewModel.quotesFlow.collectAsState()
         Box(modifier = modifier.padding(paddingValues)) {
-            if (quotes.isEmpty()) {
-                EmptyStateScreen()
-            } else {
-                ListStateScreen(quotes)
+            Crossfade(quotes.isEmpty()) { isEmpty ->
+                if (isEmpty) {
+                    EmptyStateScreen()
+                } else {
+                    ListStateScreen(quotes)
+                }
             }
         }
     }

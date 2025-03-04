@@ -1,28 +1,30 @@
 package com.podonin.quotes.presentation.ui
 
 import androidx.annotation.ColorRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,27 +33,30 @@ import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import coil3.SingletonImageLoader
 import coil3.compose.AsyncImage
 import coil3.memory.MemoryCache
+import coil3.request.CachePolicy
 import coil3.request.ImageRequest
-import com.podonin.common_ui.R
 import com.podonin.common_ui.compose.textSizeResource
 import com.podonin.common_ui.compose.toDp
 import com.podonin.quotes.presentation.ui.model.QuoteItem
+import com.podonin.quotes_impl.R
+import com.podonin.common_ui.R as CommonUiR
 
-private const val IMAGE_EXPAND_DURATION = 150
 private const val BACKGROUND_CHANGE_DURATION = 300
 private const val BACKGROUND_CHANGE_DELAY = 100
 
@@ -60,7 +65,8 @@ fun ListStateScreen(
     quotes: List<QuoteItem>,
     modifier: Modifier = Modifier
 ) {
-    val bigPadding = dimensionResource(R.dimen.material_margin_big)
+
+    val bigPadding = dimensionResource(CommonUiR.dimen.material_margin_big)
     val statusBarPaddings = WindowInsets.statusBars.asPaddingValues()
     val navBarPaddings = WindowInsets.navigationBars.asPaddingValues()
     LazyColumn(
@@ -68,70 +74,136 @@ fun ListStateScreen(
             top = statusBarPaddings.calculateTopPadding() + bigPadding,
             bottom = navBarPaddings.calculateBottomPadding() + bigPadding
         ),
-        modifier = modifier
-            .padding(
-                horizontal = bigPadding
-            )
+        modifier = modifier.fillMaxSize()
     ) {
         items(
             quotes,
             key = { it.ticker },
         ) { quoteItem ->
-            ItemQuote(quoteItem)
-        }
-    }
-}
-
-@Composable
-fun ItemQuote(quote: QuoteItem) {
-    val mediumPadding = dimensionResource(R.dimen.material_margin_medium)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(mediumPadding),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            var textHeight by remember { mutableIntStateOf(0) }
-            Row {
-                AnimatedImage(
-                    imageUrl = quote.logoUrl,
-                    parentHeight = textHeight,
-                    contentDescription = quote.ticker
-                )
-
-                Text(
-                    text = quote.ticker,
-                    fontSize = textSizeResource(com.podonin.quotes_impl.R.dimen.text_size_big),
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .fillMaxWidth(),
-                    onTextLayout = { textHeight = it.size.height }
-                )
-            }
-            if (quote.exchangeAndName.isNotBlank()) {
-                Text(
-                    text = quote.exchangeAndName,
-                    color = Color.Gray,
-                    fontSize = textSizeResource(com.podonin.quotes_impl.R.dimen.text_size_small),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-        Spacer(modifier = Modifier.width(mediumPadding))
-        Column(horizontalAlignment = Alignment.End) {
-            AnimatedText(quote)
-            Text(
-                text = quote.priceAndChange,
-                fontSize = textSizeResource(com.podonin.quotes_impl.R.dimen.text_size_normal)
+            ItemQuote(
+                quoteItem,
+                isLast = quotes.last() == quoteItem
             )
         }
     }
 }
 
 @Composable
-private fun AnimatedText(quote: QuoteItem) {
+fun ItemQuote(
+    quote: QuoteItem,
+    isLast: Boolean = false
+) {
+    val bigPadding = dimensionResource(CommonUiR.dimen.material_margin_big)
+    val mediumPadding = dimensionResource(CommonUiR.dimen.material_margin_medium)
+    val smallPadding = dimensionResource(CommonUiR.dimen.material_margin_small)
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        val (header, exchange, percent, price, arrow, divider) = createRefs()
+        var textHeight by remember { mutableIntStateOf(0) }
+        val isExchangeEmpty by rememberUpdatedState(quote.exchangeAndName.isBlank())
+        Row(
+            modifier = Modifier
+                .padding(start = bigPadding, top = mediumPadding)
+                .constrainAs(header) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    if (!isExchangeEmpty) {
+                        bottom.linkTo(exchange.top)
+                    } else {
+                        bottom.linkTo(parent.bottom)
+                    }
+                }
+        ) {
+            AnimatedImage(
+                imageUrl = quote.logoUrl,
+                parentHeight = textHeight,
+                contentDescription = quote.ticker
+            )
+            Text(
+                text = quote.ticker,
+                fontSize = textSizeResource(R.dimen.text_size_big),
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .padding(start = smallPadding),
+                onTextLayout = { textHeight = it.size.height }
+            )
+        }
+
+        if (!isExchangeEmpty) {
+            Text(
+                text = quote.exchangeAndName,
+                color = Color.Gray,
+                fontSize = textSizeResource(R.dimen.text_size_small),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .padding(top = smallPadding, bottom = mediumPadding, start = bigPadding)
+                    .constrainAs(exchange) {
+                        top.linkTo(price.top)
+                        bottom.linkTo(price.bottom)
+                        start.linkTo(header.start)
+                        end.linkTo(price.start)
+                        width = Dimension.fillToConstraints
+                    }
+            )
+        }
+        AnimatedText(
+            isPositive = quote.isPositive,
+            actualPrice = quote.actualPrice,
+            percent = quote.percent,
+            modifier = Modifier
+                .padding(top = mediumPadding)
+                .constrainAs(percent) {
+                    top.linkTo(parent.top)
+                    end.linkTo(arrow.start)
+                }
+        )
+        Text(
+            text = quote.priceAndChange,
+            fontSize = textSizeResource(R.dimen.text_size_normal),
+            modifier = Modifier
+                .padding(top = smallPadding, bottom = mediumPadding)
+                .constrainAs(price) {
+                    top.linkTo(percent.bottom)
+                    end.linkTo(arrow.start)
+                }
+        )
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_forward),
+            tint = Color.Gray,
+            contentDescription = null,
+            modifier = Modifier
+                .height(dimensionResource(R.dimen.arrow_size))
+                .padding(start = mediumPadding, end = bigPadding)
+                .constrainAs(arrow) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    end.linkTo(parent.end)
+                }
+        )
+        if (!isLast) {
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(start = bigPadding + smallPadding)
+                    .constrainAs(divider) {
+                        bottom.linkTo(parent.bottom)
+                    }
+            )
+        }
+    }
+}
+
+@Composable
+private fun AnimatedText(
+    isPositive: Boolean,
+    actualPrice: Double,
+    percent: String,
+    modifier: Modifier = Modifier
+) {
     var actualPriceBefore by remember {
         mutableDoubleStateOf(0.0)
     }
@@ -145,14 +217,14 @@ private fun AnimatedText(quote: QuoteItem) {
             actualPriceChanged = ActualPriceChanged.None
         }
     )
-    val actualTextColor = if (quote.isPositive) {
-        colorResource(com.podonin.quotes_impl.R.color.light_green)
+    val actualTextColor = if (isPositive) {
+        colorResource(R.color.light_green)
     } else {
-        colorResource(com.podonin.quotes_impl.R.color.light_red)
+        colorResource(R.color.light_red)
     }
 
     val targetTextColor = if (actualPriceChanged != ActualPriceChanged.None) {
-        colorResource(com.podonin.quotes_impl.R.color.white)
+        colorResource(R.color.white)
     } else {
         actualTextColor
     }
@@ -164,8 +236,8 @@ private fun AnimatedText(quote: QuoteItem) {
         }
     )
 
-    LaunchedEffect(quote.actualPrice) {
-        val actualPrice = quote.actualPrice
+    LaunchedEffect(actualPrice) {
+        val actualPrice = actualPrice
         actualPriceChanged = when {
             actualPriceBefore == 0.0 -> {
                 actualPriceBefore = actualPrice
@@ -193,19 +265,19 @@ private fun AnimatedText(quote: QuoteItem) {
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .wrapContentSize()
             .background(
                 color = animatedBackgroundColor,
-                shape = RoundedCornerShape(dimensionResource(R.dimen.material_margin_medium))
+                shape = RoundedCornerShape(dimensionResource(CommonUiR.dimen.material_margin_medium))
             )
-            .padding(dimensionResource(R.dimen.material_margin_small))
+            .padding(dimensionResource(CommonUiR.dimen.material_margin_small))
     ) {
         Text(
-            text = quote.percent,
+            text = percent,
             style = TextStyle(
                 color = animatedTextColor,
-                fontSize = textSizeResource(com.podonin.quotes_impl.R.dimen.text_size_big)
+                fontSize = textSizeResource(R.dimen.text_size_big)
             )
         )
     }
@@ -215,50 +287,45 @@ private fun AnimatedText(quote: QuoteItem) {
 private fun AnimatedImage(
     imageUrl: String,
     parentHeight: Int,
+    modifier: Modifier = Modifier,
     contentDescription: String? = null,
 ) {
     val context = LocalContext.current
-    val imageLoader = SingletonImageLoader.get(context)
+    val imageLoader by remember { mutableStateOf(SingletonImageLoader.get(context)) }
     val isCached by remember {
         mutableStateOf(
             imageLoader.memoryCache?.get(MemoryCache.Key(imageUrl)) != null
         )
     }
-    var isLoaded by remember { mutableStateOf(false) }
+    var isLoaded by remember { mutableStateOf(isCached) }
 
     LaunchedEffect(imageUrl) {
         val request = ImageRequest.Builder(context)
             .memoryCacheKey(imageUrl)
+            .memoryCachePolicy(CachePolicy.ENABLED)
             .data(imageUrl)
             .build()
 
         val result = imageLoader.execute(request)
-        isLoaded = result.image != null
+        isLoaded = (result.image?.size ?: 0) > 4
     }
 
-    val imageSize = parentHeight.toDp()
-    val animatedWidth by animateDpAsState(
-        targetValue = if (isLoaded) imageSize else 0.dp,
-        animationSpec = tween(IMAGE_EXPAND_DURATION)
-    )
-    val width = if (isCached) imageSize else animatedWidth
-    AsyncImage(
-        model = imageUrl,
-        contentDescription = contentDescription,
-        imageLoader = imageLoader,
-        modifier = Modifier
-            .height(imageSize)
-            .width(width),
-        contentScale = ContentScale.Fit,
-    )
-    if (isLoaded || isCached) {
-        val mediumPadding = dimensionResource(R.dimen.material_margin_medium)
-        Spacer(modifier = Modifier.width(mediumPadding))
+    AnimatedVisibility(
+        isLoaded,
+        enter = expandHorizontally()
+    ) {
+        AsyncImage(
+            model = imageUrl,
+            imageLoader = imageLoader,
+            contentDescription = contentDescription,
+            modifier = modifier.size(parentHeight.toDp())
+        )
     }
+
 }
 
 private enum class ActualPriceChanged(@ColorRes val backgroundColor: Int) {
     None(android.R.color.transparent),
-    Negative(com.podonin.quotes_impl.R.color.red),
-    Positive(com.podonin.quotes_impl.R.color.green)
+    Negative(R.color.red),
+    Positive(R.color.green)
 }
