@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import coil3.Image
 import coil3.SingletonImageLoader
 import coil3.compose.AsyncImage
 import coil3.memory.MemoryCache
@@ -294,7 +295,9 @@ private fun AnimatedImage(
     val imageLoader by remember { mutableStateOf(SingletonImageLoader.get(context)) }
     val isCached by remember {
         mutableStateOf(
-            imageLoader.memoryCache?.get(MemoryCache.Key(imageUrl)) != null
+            imageLoader.memoryCache?.get(
+                MemoryCache.Key(imageUrl)
+            )?.image.isCorrect()
         )
     }
     var isLoaded by remember { mutableStateOf(isCached) }
@@ -307,7 +310,7 @@ private fun AnimatedImage(
             .build()
 
         val result = imageLoader.execute(request)
-        isLoaded = (result.image?.size ?: 0) > 4
+        isLoaded = result.image.isCorrect()
     }
 
     AnimatedVisibility(
@@ -323,6 +326,8 @@ private fun AnimatedImage(
     }
 
 }
+
+private fun Image?.isCorrect() = this != null && width > 1 && height > 1
 
 private enum class ActualPriceChanged(@ColorRes val backgroundColor: Int) {
     None(android.R.color.transparent),
