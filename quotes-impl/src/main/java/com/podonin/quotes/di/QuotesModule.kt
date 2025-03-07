@@ -2,6 +2,9 @@ package com.podonin.quotes.di
 
 import android.content.Context
 import androidx.room.Room
+import com.podonin.common_io.BuildConfig
+import com.podonin.common_io.DispatchersHolder
+import com.podonin.common_io.web_sockets.SocketMessageMapper
 import com.podonin.quotes.data.datasources.api.QuotesApiDataSource
 import com.podonin.quotes.data.datasources.api.QuotesApiDataSourceImpl
 import com.podonin.quotes.data.datasources.database.QuoteDatabase
@@ -10,6 +13,9 @@ import com.podonin.quotes.data.datasources.database.QuotesDBDataSourceImpl
 import com.podonin.quotes.data.datasources.database.dao.QuoteDao
 import com.podonin.quotes.data.datasources.socket.QuoteSocketDataSource
 import com.podonin.quotes.data.datasources.socket.QuoteSocketDataSourceImpl
+import com.podonin.quotes.data.datasources.socket.client.QuoteSocketClient
+import com.podonin.quotes.data.mapper.SocketResponseMapper
+import com.podonin.quotes.data.model.QuoteEntity
 import com.podonin.quotes.data.repository.QuotesRepositoryImpl
 import com.podonin.quotes.data.repository.TickersRepositoryImpl
 import com.podonin.quotes.domain.QuotesInteractor
@@ -47,6 +53,10 @@ abstract class QuotesModule {
 
     @Binds
     @Singleton
+    abstract fun quotesSocketMessageMapper(impl: SocketResponseMapper): SocketMessageMapper<QuoteEntity>
+
+    @Binds
+    @Singleton
     abstract fun bindQuotesRepository(impl: QuotesRepositoryImpl): QuotesRepository
 
     @Binds
@@ -67,5 +77,18 @@ abstract class QuotesModule {
         @Provides
         @Singleton
         fun provideQuoteDao(db: QuoteDatabase): QuoteDao = db.quoteDao()
+
+        @Provides
+        @Singleton
+        fun provideQuoteSocketClient(
+            messageMapper: SocketMessageMapper<QuoteEntity>,
+            dispatchersHolder: DispatchersHolder
+        ): QuoteSocketClient {
+            return QuoteSocketClient(
+                url = BuildConfig.WEB_SOCKET_URL,
+                messageMapper = messageMapper,
+                dispatchersHolder = dispatchersHolder
+            )
+        }
     }
 }
